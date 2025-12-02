@@ -1,2 +1,2 @@
 # Personal-Random-Projects
-Just random projects I decided to take on for fun, or projects for classes
+# Trying to create a .bat or .exe to install programs using powershell onto a newly installed Windows 11 system
