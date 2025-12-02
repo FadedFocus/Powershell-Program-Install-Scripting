@@ -1,4 +1,4 @@
-#.bat file that runs the powershell script installer_stuff.ps1
+#.bat file that runs the powershell script download_installers.ps1
 @echo off
-powershell -ExecutionPolicy Bypass -File "%~dp0Install_stuff.ps1"
+powershell -ExecutionPolicy Bypass -File "%~dp0download_installers.ps1"
 pause
