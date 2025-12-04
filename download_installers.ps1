@@ -112,6 +112,25 @@ $replitOk = Install-App `
     -SilentArgs "/S" `
     -IsInstalledCheck { Test-ReplitInstalled }
 
+# === Additional applications (add more here later) ===
+# Example template – copy, paste, and customize:
+# function Test-VSCodeInstalled {
+#     $exe = "C:\Program Files\Microsoft VS Code\Code.exe"
+#     return (Test-Path $exe)
+# }
+#
+# $vscodeUrl       = "https://update.code.visualstudio.com/latest/win32-x64-user/stable"
+# $vscodeInstaller = "$env:TEMP\VSCodeSetup.exe"
+#
+# $vscodeOk = Install-App `
+#     -Name "Visual Studio Code" `
+#     -Url $vscodeUrl `
+#     -InstallerPath $vscodeInstaller `
+#     -SilentArgs "/verysilent" `
+#     -IsInstalledCheck { Test-VSCodeInstalled }
+#
+# Remember: if you add more apps, also include them in the summary logic below.
+
 # === Final summary / exit code ===
 if ($discordOk -and $replitOk) {
     Write-Log "All installers completed successfully."
