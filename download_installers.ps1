@@ -44,4 +44,25 @@ catch {
 }
 
 # Run installer silently
-Write-Log "Runn
+Write-Log "Running silent installer..."
+$process = Start-Process -FilePath $installerPath -ArgumentList "/S" -Wait -PassThru
+$exitCode = $process.ExitCode
+
+Write-Log "Installer exited with code: $exitCode"
+
+# Clean up installer file
+if (Test-Path $installerPath) {
+    Remove-Item $installerPath -Force
+    Write-Log "Installer cleaned up."
+}
+
+# Verify final install state
+if ($exitCode -eq 0 -and (Test-DiscordInstalled)) {
+    Write-Log "Discord installation SUCCESS."
+    Write-Log "---------- Finished (OK) ----------"
+    exit 0
+} else {
+    Write-Log "Discord installation FAILED. ExitCode=$exitCode; Exists=$((Test-DiscordInstalled))"
+    Write-Log "---------- Finished (FAIL) ----------"
+    exit 2
+}
