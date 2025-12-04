@@ -1,2 +1,2 @@
 #Instructions
-#run discord.ps1
+#run run.bat
