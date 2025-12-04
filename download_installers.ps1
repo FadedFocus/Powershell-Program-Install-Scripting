@@ -1,10 +1,8 @@
 # download_installers.ps1
-# Installs Discord with logging and verification.
+# Installs Discord and Replit Desktop App with logging and basic verification.
 
-# === Config ===
-$discordUrl    = "https://discord.com/api/download?platform=win&format=exe"
-$installerPath = "$env:TEMP\DiscordSetup.exe"
-$logPath       = Join-Path $PSScriptRoot "download_installers.log"
+# === Global config ===
+$logPath = Join-Path $PSScriptRoot "download_installers.log"
 
 # === Logging helper ===
 function Write-Log {
@@ -15,80 +13,113 @@ function Write-Log {
     Add-Content -Path $logPath -Value $line
 }
 
-# === Install check ===
+# === Install checks ===
 function Test-DiscordInstalled {
     $exe = "$env:LocalAppData\Discord\Update.exe"
     return (Test-Path $exe)
 }
 
-Write-Log "---------- Discord install started ----------"
-
-# If installed, skip
-if (Test-DiscordInstalled) {
-    Write-Log "Discord already installed. Skipping."
-    Write-Log "---------- Finished (Already Installed) ----------"
-    exit 0
+function Test-ReplitInstalled {
+    # This path may differ; adjust after you install Replit once and confirm.
+    $exe = "$env:LocalAppData\Replit\Replit.exe"
+    return (Test-Path $exe)
 }
 
-# Download Discord
-Write-Log "Downloading Discord from $discordUrl to $installerPath"
+# === Generic installer helper ===
+function Install-App {
+    param(
+        [string]$Name,
+        [string]$Url,
+        [string]$InstallerPath,
+        [string]$SilentArgs,
+        [ScriptBlock]$IsInstalledCheck
+    )
 
-try {
-    Invoke-WebRequest -Uri $discordUrl -OutFile $installerPath -ErrorAction Stop
-    Write-Log "Download completed successfully."
+    Write-Log "---------- $Name install started ----------"
+
+    if (& $IsInstalledCheck) {
+        Write-Log "$Name already installed. Skipping."
+        Write-Log "---------- $Name finished (Already Installed) ----------"
+        return $true
+    }
+
+    Write-Log "Downloading $Name from $Url to $InstallerPath"
+    try {
+        Invoke-WebRequest -Uri $Url -OutFile $InstallerPath -ErrorAction Stop
+        Write-Log "$Name download completed successfully."
+    }
+    catch {
+        Write-Log "$Name download FAILED: $($_.Exception.Message)"
+        Write-Log "---------- $Name finished (Download Failure) ----------"
+        return $false
+    }
+
+    Write-Log "Running $Name installer with args: $SilentArgs"
+    try {
+        $proc = Start-Process -FilePath $InstallerPath -ArgumentList $SilentArgs -Wait -PassThru
+        $exitCode = $proc.ExitCode
+        Write-Log "$Name installer exit code: $exitCode"
+    }
+    catch {
+        Write-Log "$Name installer FAILED to start: $($_.Exception.Message)"
+        $exitCode = -1
+    }
+
+    # Cleanup installer
+    if (Test-Path $InstallerPath) {
+        Remove-Item $InstallerPath -Force
+        Write-Log "$Name installer cleaned up: $InstallerPath"
+    }
+
+    # Verify install
+    $installedNow = & $IsInstalledCheck
+    if ($exitCode -eq 0 -and $installedNow) {
+        Write-Log "$Name installation SUCCESS."
+        Write-Log "---------- $Name finished (OK) ----------"
+        return $true
+    }
+    else {
+        Write-Log "$Name installation FAILED. ExitCode=$exitCode; Installed=$installedNow"
+        Write-Log "---------- $Name finished (FAIL) ----------"
+        return $false
+    }
 }
-catch {
-    Write-Log "Download FAILED: $($_.Exception.Message)"
-    Write-Log "---------- Finished (Download Failure) ----------"
-    exit 1
-}
 
-# Run installer silently
-Write-Log "Running silent installer..."
-$process = Start-Process -FilePath $installerPath -ArgumentList "/S" -Wait -PassThru
-$exitCode = $process.ExitCode
+# === Script start ===
+Write-Log "========== download_installers.ps1 started =========="
 
-Write-Log "Installer exited with code: $exitCode"
+# --- Discord ---
+$discordUrl        = "https://discord.com/api/download?platform=win&format=exe"
+$discordInstaller  = "$env:TEMP\DiscordSetup.exe"
 
-# Clean up installer file
-if (Test-Path $installerPath) {
-    Remove-Item $installerPath -Force
-    Write-Log "Installer cleaned up."
-}
+$discordOk = Install-App `
+    -Name "Discord" `
+    -Url $discordUrl `
+    -InstallerPath $discordInstaller `
+    -SilentArgs "/S" `
+    -IsInstalledCheck { Test-DiscordInstalled }
 
-# Verify final install state
-if ($exitCode -eq 0 -and (Test-DiscordInstalled)) {
-    Write-Log "Discord installation SUCCESS."
-    Write-Log "---------- Finished (OK) ----------"
-    exit 0
-} else {
-    Write-Log "Discord installation FAILED. ExitCode=$exitCode; Exists=$((Test-DiscordInstalled))"
-    Write-Log "---------- Finished (FAIL) ----------"
-    exit 2
-}
-
-# === Replit Desktop App ===
-$replitUrl        = "https://replit.com/desktop"  # official download page
+# --- Replit Desktop ---
+# NOTE: This is pinned to v1.0.14 from the official GitHub releases page.
+# If they release a new version, update the version in the URL.
+$replitUrl        = "https://github.com/replit/desktop/releases/download/v1.0.14/Replit-1.0.14.Setup.exe"
 $replitInstaller  = "$env:TEMP\ReplitSetup.exe"
 
-Write-Log "Downloading Replit Desktop App from $replitUrl"
-Invoke-WebRequest -Uri $replitUrl -OutFile $replitInstaller -ErrorAction Stop
-Write-Log "Download of Replit setup done."
+$replitOk = Install-App `
+    -Name "Replit Desktop" `
+    -Url $replitUrl `
+    -InstallerPath $replitInstaller `
+    -SilentArgs "/S" `
+    -IsInstalledCheck { Test-ReplitInstalled }
 
-Write-Log "Running Replit installer..."
-$replitProc = Start-Process -FilePath $replitInstaller -ArgumentList "/S" -Wait -PassThru
-Write-Log "Replit installer exit code: $($replitProc.ExitCode)"
-
-# Clean up
-if (Test-Path $replitInstaller) {
-    Remove-Item $replitInstaller -Force
-    Write-Log "Removed installer file."
+# === Final summary / exit code ===
+if ($discordOk -and $replitOk) {
+    Write-Log "All installers completed successfully."
+    Write-Log "========== download_installers.ps1 finished (OK) =========="
+    exit 0
 }
-
-# Optionally check if Replit is installed (adjust path if needed)
-$possiblePath1 = "$env:LOCALAPPDATA\Replit\Replit.exe"
-if (Test-Path $possiblePath1 -and $replitProc.ExitCode -eq 0) {
-    Write-Log "Replit Desktop App installation SUCCESS."
-} else {
-    Write-Log "Replit installation may have FAILED. Check manually."
+else {
+    Write-Log "One or more installers FAILED. DiscordOK=$discordOk; ReplitOK=$replitOk"
+    Write-Log "========== download_installers.ps1 finished (FAIL) =========="
+    exit 1
 }
