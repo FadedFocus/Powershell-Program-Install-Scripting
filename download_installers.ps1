@@ -66,3 +66,29 @@ if ($exitCode -eq 0 -and (Test-DiscordInstalled)) {
     Write-Log "---------- Finished (FAIL) ----------"
     exit 2
 }
+
+# === Replit Desktop App ===
+$replitUrl        = "https://replit.com/desktop"  # official download page
+$replitInstaller  = "$env:TEMP\ReplitSetup.exe"
+
+Write-Log "Downloading Replit Desktop App from $replitUrl"
+Invoke-WebRequest -Uri $replitUrl -OutFile $replitInstaller -ErrorAction Stop
+Write-Log "Download of Replit setup done."
+
+Write-Log "Running Replit installer..."
+$replitProc = Start-Process -FilePath $replitInstaller -ArgumentList "/S" -Wait -PassThru
+Write-Log "Replit installer exit code: $($replitProc.ExitCode)"
+
+# Clean up
+if (Test-Path $replitInstaller) {
+    Remove-Item $replitInstaller -Force
+    Write-Log "Removed installer file."
+}
+
+# Optionally check if Replit is installed (adjust path if needed)
+$possiblePath1 = "$env:LOCALAPPDATA\Replit\Replit.exe"
+if (Test-Path $possiblePath1 -and $replitProc.ExitCode -eq 0) {
+    Write-Log "Replit Desktop App installation SUCCESS."
+} else {
+    Write-Log "Replit installation may have FAILED. Check manually."
+}
