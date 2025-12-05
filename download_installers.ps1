@@ -1,5 +1,8 @@
 # download_installers.ps1
-# Installs Discord and Replit Desktop App with logging and basic verification.
+# Installs Programs
+# Current Apps:
+# Discord
+# Repl.it Desktop App
 
 # === Global config ===
 $logPath = Join-Path $PSScriptRoot "download_installers.log"
@@ -14,6 +17,15 @@ function Write-Log {
 }
 
 # === Install checks ===
+# Template for future apps:
+# 1) Create a Test-APPNAMEInstalled function in the "Install checks" section.
+# 2) Then use that function here with Install-App, like this:
+#
+# function Test-VSCodeInstalled {
+#     $exe = "C:\Program Files\Microsoft VS Code\Code.exe"
+#     return (Test-Path $exe)
+# }
+
 function Test-DiscordInstalled {
     $exe = "$env:LocalAppData\Discord\Update.exe"
     return (Test-Path $exe)
@@ -113,11 +125,7 @@ $replitOk = Install-App `
     -IsInstalledCheck { Test-ReplitInstalled }
 
 # === Additional applications (add more here later) ===
-# Example template – copy, paste, and customize:
-# function Test-VSCodeInstalled {
-#     $exe = "C:\Program Files\Microsoft VS Code\Code.exe"
-#     return (Test-Path $exe)
-# }
+# TEMPLATE for future apps in the === Script start === section:
 #
 # $vscodeUrl       = "https://update.code.visualstudio.com/latest/win32-x64-user/stable"
 # $vscodeInstaller = "$env:TEMP\VSCodeSetup.exe"
@@ -128,17 +136,39 @@ $replitOk = Install-App `
 #     -InstallerPath $vscodeInstaller `
 #     -SilentArgs "/verysilent" `
 #     -IsInstalledCheck { Test-VSCodeInstalled }
+
+# === Track overall results ===
+$allOk = $true
+$failedApps = @()
+
+# Record Discord result
+if (-not $discordOk) {
+    $allOk = $false
+    $failedApps += "Discord"
+}
+
+# Record Replit result
+if (-not $replitOk) {
+    $allOk = $false
+    $failedApps += "Replit Desktop"
+}
+
+# IMPORTANT:
+# When you add new installers later, add their tracking here:
 #
-# Remember: if you add more apps, also include them in the summary logic below.
+# if (-not $vscodeOk) {
+#     $allOk = $false
+#     $failedApps += "Visual Studio Code"
+# }
 
 # === Final summary / exit code ===
-if ($discordOk -and $replitOk) {
-    Write-Log "All installers completed successfully."
+if ($allOk) {
+    Write-Log "All installers completed successfully (including apps already installed)."
     Write-Log "========== download_installers.ps1 finished (OK) =========="
     exit 0
 }
 else {
-    Write-Log "One or more installers FAILED. DiscordOK=$discordOk; ReplitOK=$replitOk"
+    Write-Log "Some installers FAILED: $($failedApps -join ', ')"
     Write-Log "========== download_installers.ps1 finished (FAIL) =========="
     exit 1
 }
