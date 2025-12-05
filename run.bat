@@ -1,6 +1,4 @@
 @echo off
-cd /d "%~dp0"
-
 echo Running download_installers.ps1...
 powershell -ExecutionPolicy Bypass -File "%~dp0download_installers.ps1"
 echo.
@@ -8,9 +6,9 @@ echo.
 echo PowerShell exit code: %ERRORLEVEL%
 
 if %ERRORLEVEL% EQU 0 (
-    echo [OK] Discord installed successfully or was already installed.
+    echo [OK] All installers completed successfully or were already installed.
 ) else (
-    echo [ERROR] Discord install failed. Check the log:
+    echo [ERROR] One or more installers failed. Check the log:
     echo        "%~dp0download_installers.log"
 )
 
