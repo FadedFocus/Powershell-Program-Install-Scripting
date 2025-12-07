@@ -3,6 +3,7 @@
 # Current Apps:
 # Discord
 # Repl.it Desktop App
+# Wireshark [WIP]
 
 # === Global config ===
 $logPath = Join-Path $PSScriptRoot "download_installers.log"
@@ -32,13 +33,11 @@ function Test-DiscordInstalled {
 }
 
 function Test-ReplitInstalled {
-    # This path may differ; adjust after you install Replit once and confirm.
     $exe = "$env:LocalAppData\Replit\Replit.exe"
     return (Test-Path $exe)
 }
 
 function Test-WiresharkInstalled {
-    # This path may differ; adjust after you install Replit once and confirm.
     $exe = "$env:LocalAppData\Wireshark\Wireshark.exe"
     return (Test-Path $exe)
 }
