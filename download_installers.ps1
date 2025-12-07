@@ -129,7 +129,7 @@ $replitOk = Install-App `
 
 # --- Wireshark ---
 $wiresharkUrl        = "https://2.na.dl.wireshark.org/win64/Wireshark-4.6.2-x64.exe"
-$wiresharkInstaller  = "$env:TEMP\Wireshark-4.6.2-x64.exe"
+$wiresharkInstaller  = "$env:TEMP\Wireshark.exe"
 
 $wiresharkOk = Install-App `
     -Name "Wireshark" `
