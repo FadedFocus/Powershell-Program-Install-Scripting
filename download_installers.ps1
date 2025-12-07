@@ -152,7 +152,7 @@ $slimeVROk = Install-App `
     -Name "slimeVR" `
     -Url $slimeVRURL `
     -InstallerPath $slimeVRInstaller `
-    -SilentArgs "" `
+    #-SilentArgs "/S" ` NOT NEEDED
     -IsInstalledCheck { Test-slimeVRInstalled }
 
 # === Additional applications (add more here later) ===
