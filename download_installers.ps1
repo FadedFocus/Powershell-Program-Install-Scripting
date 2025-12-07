@@ -37,6 +37,12 @@ function Test-ReplitInstalled {
     return (Test-Path $exe)
 }
 
+function Test-WiresharkInstalled {
+    # This path may differ; adjust after you install Replit once and confirm.
+    $exe = "$env:LocalAppData\Wireshark\Wireshark.exe"
+    return (Test-Path $exe)
+}
+
 # === Generic installer helper ===
 function Install-App {
     param(
@@ -112,8 +118,6 @@ $discordOk = Install-App `
     -IsInstalledCheck { Test-DiscordInstalled }
 
 # --- Replit Desktop ---
-# NOTE: This is pinned to v1.0.14 from the official GitHub releases page.
-# If they release a new version, update the version in the URL.
 $replitUrl        = "https://github.com/replit/desktop/releases/download/v1.0.14/Replit-1.0.14.Setup.exe"
 $replitInstaller  = "$env:TEMP\ReplitSetup.exe"
 
@@ -123,6 +127,18 @@ $replitOk = Install-App `
     -InstallerPath $replitInstaller `
     -SilentArgs "/S" `
     -IsInstalledCheck { Test-ReplitInstalled }
+
+# --- Wireshark ---
+$wiresharkUrl        = "https://2.na.dl.wireshark.org/win64/Wireshark-latest.exe"
+$wiresharkInstaller  = "$env:TEMP\Wireshark.exe"
+
+$wiresharkOk = Install-App `
+    -Name "Wireshark" `
+    -Url $wiresharkUrl `
+    -InstallerPath $wiresharkInstaller`
+    -SilentArgs "/S" `
+    -IsInstalledCheck { Test-WiresharkInstalled }
+    
 
 # === Additional applications (add more here later) ===
 # TEMPLATE for future apps in the === Script start === section:
