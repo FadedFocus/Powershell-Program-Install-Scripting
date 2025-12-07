@@ -1,9 +1,10 @@
-# download_installers.ps1
+# download_installers.ps1 ver. 4.0.17
 # Installs Programs
 # Current Apps:
 # Discord
 # Repl.it Desktop App
-# Wireshark [WIP]
+# Wireshark
+# SlimeVR
 
 # === Global config ===
 $logPath = Join-Path $PSScriptRoot "download_installers.log"
