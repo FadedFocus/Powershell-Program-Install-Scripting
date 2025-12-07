@@ -138,7 +138,6 @@ $wiresharkOk = Install-App `
     -InstallerPath $wiresharkInstaller`
     -SilentArgs "/S" `
     -IsInstalledCheck { Test-WiresharkInstalled }
-    
 
 # === Additional applications (add more here later) ===
 # TEMPLATE for future apps in the === Script start === section:
@@ -167,6 +166,12 @@ if (-not $discordOk) {
 if (-not $replitOk) {
     $allOk = $false
     $failedApps += "Replit Desktop"
+}
+
+# Record Wireshark result
+if (-not $wiresharkOk) {
+    $allOk - $false
+    $failedApps += "Wireshark"
 }
 
 # IMPORTANT:
