@@ -1,22 +1,22 @@
-------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------
 Build ver. 3.9
 [3 apps currently, 9 code changes to stable]
 -Discord
 -Replit Desktop
 -Wireshark
 
-------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------
 
 Usage:
 Runs a script to install programs for any windows 11 computer with git capabilities + openSSH(client/server) capabilities
 
-------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------
 
 Pre-Requisites:
 for git method - install git, openSSH client, openSSH server, github repo access MUST BE granted
 otherwise use non-git method
 
-------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------
 
 OPTIONAL pre-requisites: Set up environment variables in Win11 so you can do "run" instead of "./run.bat" in terminal
 1. Press Start
@@ -28,7 +28,7 @@ OPTIONAL pre-requisites: Set up environment variables in Win11 so you can do "ru
 7. Click New
 8. Past the folder path where "run.bat" lives: ((e.g. "C:\Users\[username]\Powershell-Program-Install-Scripting"))
 
-------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------
 
 How-to-Use: [non-git]
 1. Unzip the .zip into a folder anywhere you like(copy the folder path for the next steps & the OPTIONAL step)
@@ -37,7 +37,7 @@ How-to-Use: [non-git]
 4. in terminal type in "run", and the prorams listed above should install, if not already.
 5. DONE.
 
-------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------
 
 How-to-Use: [assuming git is installed, openSSH client & openSSH server, github repo access is granted, AND OPTIONAL pre-requisites were followed]
 1. in terminal change directory to where you want (e.g. cd E:\)
