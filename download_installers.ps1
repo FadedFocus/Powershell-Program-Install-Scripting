@@ -17,15 +17,51 @@ function Write-Log {
     Add-Content -Path $logPath -Value $line
 }
 
+
+# === Process helper ===
+function Stop-AppProcesses {
+    param(
+        [string[]]$NamePatterns
+    )
+
+    if (-not $NamePatterns -or $NamePatterns.Count -eq 0) {
+        return
+    }
+
+    Write-Log "Checking for running processes: $($NamePatterns -join ', ')"
+
+    foreach ($pattern in $NamePatterns) {
+        try {
+            # -Name supports wildcards like "slime*" or "Discord*"
+            $procs = Get-Process -Name $pattern -ErrorAction SilentlyContinue
+            if ($procs) {
+                Write-Log "Stopping processes matching '$pattern': $($procs.Name -join ', ')"
+                $procs | Stop-Process -Force
+            }
+            else {
+                Write-Log "No processes found for pattern '$pattern'."
+            }
+        }
+        catch {
+            Write-Log "Error while stopping processes for pattern '$pattern': $($_.Exception.Message)"
+        }
+    }
+}
+
 # === Install checks ===
 # Template for future apps:
 # 1) Create a Test-APPNAMEInstalled function in the "Install checks" section.
-# 2) Then use that function here with Install-App, like this:
+# 2) Then use that function here with Install-App, like this
 #
-# function Test-VSCodeInstalled {
-#     $exe = "C:\Program Files\Microsoft VS Code\Code.exe"
-#     return (Test-Path $exe)
-# }
+# $vscodeUrl       = "https://update.code.visualstudio.com/latest/win32-x64-user/stable"
+# $vscodeInstaller = "$env:TEMP\VSCodeSetup.exe"
+#
+# $vscodeOk = Install-App `
+#     -Name "Visual Studio Code" `
+#     -Url $vscodeUrl `
+#     -InstallerPath $vscodeInstaller `
+#     -SilentArgs "/VERYSILENT /NORESTART" `
+#     -IsInstalledCheck { Test-VSCodeInstalled }
 
 function Test-DiscordInstalled {
     $exe = "$env:LocalAppData\Discord\Update.exe"
@@ -66,29 +102,30 @@ function Install-App {
         return $true
     }
 
+    # Download installer
     Write-Log "Downloading $Name from $Url to $InstallerPath"
     try {
-        Invoke-WebRequest -Uri $Url -OutFile $InstallerPath -ErrorAction Stop
+        Invoke-WebRequest -Uri $Url -OutFile $InstallerPath -UseBasicParsing
         Write-Log "$Name download completed successfully."
     }
     catch {
         Write-Log "$Name download FAILED: $($_.Exception.Message)"
-        Write-Log "---------- $Name finished (Download Failure) ----------"
+        Write-Log "---------- $Name finished (FAIL: download) ----------"
         return $false
     }
 
+    # Run installer
     Write-Log "Running $Name installer with args: $SilentArgs"
+    $exitCode = $null
     try {
         if ([string]::IsNullOrWhiteSpace($SilentArgs)) {
-            # No arguments – run installer normally
-            $proc = Start-Process -FilePath $InstallerPath -Wait -PassThru
+            $process = Start-Process -FilePath $InstallerPath -PassThru
         }
         else {
-            # Normal case – pass silent or other args
-            $proc = Start-Process -FilePath $InstallerPath -ArgumentList $SilentArgs -Wait -PassThru
+            $process = Start-Process -FilePath $InstallerPath -ArgumentList $SilentArgs -PassThru
         }
-
-        $exitCode = $proc.ExitCode
+        $process.WaitForExit()
+        $exitCode = $process.ExitCode
         Write-Log "$Name installer exit code: $exitCode"
     }
     catch {
@@ -119,9 +156,18 @@ function Install-App {
 # === Script start ===
 Write-Log "========== download_installers.ps1 started =========="
 
-# --- Discord ---
-$discordUrl        = "https://discord.com/api/download?platform=win&format=exe"
-$discordInstaller  = "$env:TEMP\DiscordSetup.exe"
+# For new apps, follow this pattern:
+# 1) Define the Test-APPNAMEInstalled function above.
+# 2) Set $appUrl and $appInstaller here in the script.
+# 3) Call Install-App and capture its boolean result.
+# 4) Track overall success with $allOk and $failedApps.
+
+$allOk = $true
+$failedApps = @()
+
+# === Discord ===
+$discordUrl       = "https://discord.com/api/download?platform=win"
+$discordInstaller = "$env:TEMP\DiscordSetup.exe"
 
 $discordOk = Install-App `
     -Name "Discord" `
@@ -130,9 +176,14 @@ $discordOk = Install-App `
     -SilentArgs "/S" `
     -IsInstalledCheck { Test-DiscordInstalled }
 
-# --- Replit Desktop ---
-$replitUrl        = "https://github.com/replit/desktop/releases/download/v1.0.14/Replit-1.0.14.Setup.exe"
-$replitInstaller  = "$env:TEMP\ReplitSetup.exe"
+if (-not $discordOk) {
+    $allOk = $false
+    $failedApps += "Discord"
+}
+
+# === Replit Desktop App ===
+$replitUrl       = "https://desktop.replit.com/public/Replit%20Setup.exe"
+$replitInstaller = "$env:TEMP\ReplitSetup.exe"
 
 $replitOk = Install-App `
     -Name "Replit Desktop" `
@@ -141,9 +192,14 @@ $replitOk = Install-App `
     -SilentArgs "/S" `
     -IsInstalledCheck { Test-ReplitInstalled }
 
-# --- Wireshark ---
-$wiresharkUrl        = "https://2.na.dl.wireshark.org/win64/Wireshark-4.6.2-x64.exe"
-$wiresharkInstaller  = "$env:TEMP\Wireshark.exe"
+if (-not $replitOk) {
+    $allOk = $false
+    $failedApps += "Replit Desktop"
+}
+
+# === Wireshark ===
+$wiresharkUrl       = "https://www.wireshark.org/download/win64/all-versions/Wireshark-latest-x64.exe"
+$wiresharkInstaller = "$env:TEMP\WiresharkSetup.exe"
 
 $wiresharkOk = Install-App `
     -Name "Wireshark" `
@@ -152,16 +208,26 @@ $wiresharkOk = Install-App `
     -SilentArgs "/S" `
     -IsInstalledCheck { Test-WiresharkInstalled }
 
-# --- slimeVR ---
-# UI is required to find your SteamVR folder, no avoiding that unfortunately
-# -SilentArgs "/S" was removed for this one
-$slimeVRUrl        = "https://github.com/SlimeVR/SlimeVR-Installer/releases/download/v0.2.1/slimevr_web_installer.exe"
+if (-not $wiresharkOk) {
+    $allOk = $false
+    $failedApps += "Wireshark"
+}
+
+# === slimeVR ===
+# NOTE:
+# - slimeVR needs the full UI so it can find your SteamVR folder, no silent args.
+# - We also kill any running SlimeVR processes first to avoid the "already running" wizard error.
+
+$slimeVRUrl        = "https://github.com/SlimeVR/SlimeVR-Installer/releases/download/latest/slimevr_web_installer.exe"
 $slimeVRInstaller  = "$env:TEMP\slimeVR.exe"
+
+Stop-AppProcesses -NamePatterns @('SlimeVR*')
 
 $slimeVROk = Install-App `
     -Name "slimeVR" `
     -Url $slimeVRURL `
     -InstallerPath $slimeVRInstaller `
+    -SilentArgs "/S" `
     -IsInstalledCheck { Test-slimeVRInstalled }
 
 # === Additional applications (add more here later) ===
@@ -174,12 +240,15 @@ $slimeVROk = Install-App `
 #     -Name "Visual Studio Code" `
 #     -Url $vscodeUrl `
 #     -InstallerPath $vscodeInstaller `
-#     -SilentArgs "/verysilent" `
+#     -SilentArgs "/VERYSILENT /NORESTART" `
 #     -IsInstalledCheck { Test-VSCodeInstalled }
 
-# === Track overall results ===
-$allOk = $true
-$failedApps = @()
+# if (-not $vscodeOk) {
+#     $allOk = $false
+#     $failedApps += "Visual Studio Code"
+# }
+
+# === Result aggregation ===
 
 # Record Discord result
 if (-not $discordOk) {
@@ -195,13 +264,13 @@ if (-not $replitOk) {
 
 # Record Wireshark result
 if (-not $wiresharkOk) {
-    $allOk - $false
+    $allOk = $false
     $failedApps += "Wireshark"
 }
 
 # Record slimeVR result
 if (-not $slimeVROk) {
-    $allOk - $false
+    $allOk = $false
     $failedApps += "SlimeVR"
 }
 
