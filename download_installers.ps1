@@ -145,6 +145,7 @@ $wiresharkOk = Install-App `
 
 # --- slimeVR ---
 # UI is required to find your SteamVR folder, no avoiding that unfortunately
+# -SilentArgs "/S" was removed for this one
 $slimeVRUrl        = "https://github.com/SlimeVR/SlimeVR-Installer/releases/latest/download/slimevr_web_installer.exe"
 $slimeVRInstaller  = "$env:TEMP\slimeVR.exe"
 
@@ -152,7 +153,6 @@ $slimeVROk = Install-App `
     -Name "slimeVR" `
     -Url $slimeVRURL `
     -InstallerPath $slimeVRInstaller `
-    #-SilentArgs "/S" ` NOT NEEDED
     -IsInstalledCheck { Test-slimeVRInstalled }
 
 # === Additional applications (add more here later) ===
