@@ -78,7 +78,15 @@ function Install-App {
 
     Write-Log "Running $Name installer with args: $SilentArgs"
     try {
-        $proc = Start-Process -FilePath $InstallerPath -ArgumentList $SilentArgs -Wait -PassThru
+        if ([string]::IsNullOrWhiteSpace($SilentArgs)) {
+            # No arguments – run installer normally
+            $proc = Start-Process -FilePath $InstallerPath -Wait -PassThru
+        }
+        else {
+            # Normal case – pass silent or other args
+            $proc = Start-Process -FilePath $InstallerPath -ArgumentList $SilentArgs -Wait -PassThru
+        }
+
         $exitCode = $proc.ExitCode
         Write-Log "$Name installer exit code: $exitCode"
     }
