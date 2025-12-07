@@ -1,10 +1,10 @@
 -----------------------------------------------------------------------------------------------------------------------------
-Build ver. 4.0.17
-[4 apps currently, 9 code changes to stable]
+Build ver. 4.4.17
+[Core script version based on # of apps, # of simple appending for new apps, 17 core code changes to stablize app installations]
 -Discord
 -Replit Desktop
--Wireshark
--SlimeVR
+-Wireshark UAC required
+-SlimeVR UAC required
 
 -----------------------------------------------------------------------------------------------------------------------------
 
@@ -43,5 +43,6 @@ How-to-Use: [non-git]
 How-to-Use: [assuming git is installed, openSSH client & openSSH server, github repo access is granted, AND OPTIONAL pre-requisites were followed]
 1. in terminal change directory to where you want (e.g. cd E:\)
 2. use "git clone [repo https link]" (e.g. git clone https://github.com/FadedFocus/Powershell-Program-Install-Scripting.git)
-3. the folder "Powershell-Program-Install-Scripting" should now exist with all the required files for the script
-4. in terminal you can now type "run" and the script will run and silently install all programs UAC may be required
+3. now change directory to the newly cloned repo "Powershell-Program-Install-Scripting" (e.g. cd E:\Powershell-Program-Install-Scripting\)
+4. from now on you must be in that directory to run the script or update it using "git pull"
+5. in terminal you can now type "run" and the script will run and silently install all programs UAC may be required
