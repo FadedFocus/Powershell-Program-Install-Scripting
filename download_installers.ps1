@@ -218,7 +218,7 @@ if (-not $wiresharkOk) {
 # - slimeVR needs the full UI so it can find your SteamVR folder, no silent args.
 # - We also kill any running SlimeVR processes first to avoid the "already running" wizard error.
 
-$slimeVRUrl        = "https://github.com/SlimeVR/SlimeVR-Installer/releases/download/latest/slimevr_web_installer.exe"
+$slimeVRUrl        = "https://github.com/SlimeVR/SlimeVR-Installer/releases/latest/download/slimevr_web_installer.exe"
 $slimeVRInstaller  = "$env:TEMP\slimeVR.exe"
 
 Stop-AppProcesses -NamePatterns @('SlimeVR*')
