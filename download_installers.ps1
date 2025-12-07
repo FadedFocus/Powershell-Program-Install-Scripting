@@ -134,7 +134,7 @@ $wiresharkInstaller  = "$env:TEMP\Wireshark.exe"
 $wiresharkOk = Install-App `
     -Name "Wireshark" `
     -Url $wiresharkUrl `
-    -InstallerPath $wiresharkInstaller`
+    -InstallerPath $wiresharkInstaller `
     -SilentArgs "/S" `
     -IsInstalledCheck { Test-WiresharkInstalled }
 
