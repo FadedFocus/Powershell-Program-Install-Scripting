@@ -43,7 +43,7 @@ function Test-WiresharkInstalled {
 }
 
 function Test-slimeVRInstalled {
-    $exe = "$env:LocalAppData\slimeVR/slimeVR.exe"
+    $exe = "$env:ProgramFiles\slimeVR/slimeVR.exe"
     return (Test-Path $exe)
 }
 
@@ -144,6 +144,7 @@ $wiresharkOk = Install-App `
     -IsInstalledCheck { Test-WiresharkInstalled }
 
 # --- slimeVR ---
+# UI is required to find your SteamVR folder, no avoiding that unfortunately
 $slimeVRUrl        = "https://github.com/SlimeVR/SlimeVR-Installer/releases/latest/download/slimevr_web_installer.exe"
 $slimeVRInstaller  = "$env:TEMP\slimeVR.exe"
 
