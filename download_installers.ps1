@@ -39,7 +39,7 @@ function Test-ReplitInstalled {
 
 function Test-WiresharkInstalled {
     $exe = "$env:LocalAppData\Wireshark\Wireshark.exe"
-    return (Test-Path $exe)
+    return (Test-Path $pfPath)
 }
 
 # === Generic installer helper ===
