@@ -43,7 +43,7 @@ function Test-WiresharkInstalled {
 }
 
 function Test-slimeVRInstalled {
-    $exe = "$env:LocalAppData\slimeVR/slimeVR.exe"
+    $exe = "$env:ProgramFiles\slimeVR/slimeVR.exe"
     return (Test-Path $exe)
 }
 
