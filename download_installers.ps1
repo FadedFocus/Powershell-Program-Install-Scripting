@@ -45,6 +45,7 @@ function Test-WiresharkInstalled {
 function Test-slimeVRInstalled {
     $exe = "$env:LocalAppData\slimeVR/slimeVR.exe"
     return (Test-Path $exe)
+}
 
 # === Generic installer helper ===
 function Install-App {
