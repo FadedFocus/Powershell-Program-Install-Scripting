@@ -128,7 +128,7 @@ $replitOk = Install-App `
     -IsInstalledCheck { Test-ReplitInstalled }
 
 # --- Wireshark ---
-$wiresharkUrl        = "https://2.na.dl.wireshark.org/win64/Wireshark-latest.exe"
+$wiresharkUrl        = "https://2.na.dl.wireshark.org/win64/Wireshark-4.6.2-x64.exe"
 $wiresharkInstaller  = "$env:TEMP\Wireshark.exe"
 
 $wiresharkOk = Install-App `
