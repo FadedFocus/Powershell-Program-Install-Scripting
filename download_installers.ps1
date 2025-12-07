@@ -44,7 +44,7 @@ function Test-WiresharkInstalled {
 
 function Test-slimeVRInstalled {
     $pf86 = ${env:ProgramFiles(x86)}
-    $exe = "$env:pf86\SlimeVR Server\slimevr.exe"
+    $exe = "$pf86\SlimeVR Server\slimevr.exe"
     return (Test-Path $exe)
 }
 
