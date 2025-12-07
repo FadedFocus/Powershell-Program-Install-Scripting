@@ -42,6 +42,10 @@ function Test-WiresharkInstalled {
     return (Test-Path $exe)
 }
 
+function Test-slimeVRInstalled {
+    $exe = "$env:LocalAppData\slimeVR/slimeVR.exe"
+    return (Test-Path $exe)
+
 # === Generic installer helper ===
 function Install-App {
     param(
@@ -138,6 +142,17 @@ $wiresharkOk = Install-App `
     -SilentArgs "/S" `
     -IsInstalledCheck { Test-WiresharkInstalled }
 
+# --- slimeVR ---
+$slimeVRUrl        = "https://github.com/SlimeVR/SlimeVR-Installer/releases/latest/download/slimevr_web_installer.exe"
+$slimeVRInstaller  = "$env:TEMP\slimeVR.exe"
+
+$slimeVROk = Install-App `
+    -Name "slimeVR" `
+    -Url $slimeVRURL `
+    -InstallerPath $slimeVRInstaller `
+    -SilentArgs "/S" `
+    -IsInstalledCheck { Test-slimeVRInstalled }
+
 # === Additional applications (add more here later) ===
 # TEMPLATE for future apps in the === Script start === section:
 #
@@ -171,6 +186,12 @@ if (-not $replitOk) {
 if (-not $wiresharkOk) {
     $allOk - $false
     $failedApps += "Wireshark"
+}
+
+# Record slimeVR result
+if (-not $slimeVROk) {
+    $allOk - $false
+    $failedApps += "SlimeVR"
 }
 
 # IMPORTANT:
