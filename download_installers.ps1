@@ -85,6 +85,12 @@ function Test-slimeVRInstalled {
     return (Test-Path $exe)
 }
 
+function Test-obsStudioInstalled {
+    $pf86 = ${env:ProgramFiles(x86)}
+    $exe = "$pf86\obsStudio\obsStudio.exe"
+    return (Test-Path $exe)
+}
+
 # === Generic installer helper ===
 function Install-App {
     param(
@@ -231,6 +237,19 @@ $slimeVROk = Install-App `
     -SilentArgs "/S" `
     -IsInstalledCheck { Test-slimeVRInstalled }
 
+# === OBS Studio ===
+$obsStudioUrl        = "https://github.com/obsproject/obs-studio/releases/latest/download/OBS-Studio-32.0.4-Windows-x64-Installer.exe"
+$obsStudioInstaller  = "$env:TEMP\obsStudio.exe"
+
+Stop-AppProcesses -NamePatterns @('obsStudio*')
+
+$slimeVROk = Install-App `
+    -Name "obsStudio" `
+    -Url $obsStudioURL `
+    -InstallerPath $obsStudioInstaller `
+    -SilentArgs "/S" `
+    -IsInstalledCheck { Test-obsStudioInstalled }
+
 # === Additional applications (add more here later) ===
 # TEMPLATE for future apps in the === Script start === section:
 #
@@ -273,6 +292,12 @@ if (-not $wiresharkOk) {
 if (-not $slimeVROk) {
     $allOk = $false
     $failedApps += "SlimeVR"
+}
+
+# Record OBS Studio result
+if (-not $obsStudioOk) {
+    $allOk = $false
+    $failedAps += "OBS Studio"
 }
 
 # IMPORTANT:
