@@ -247,7 +247,7 @@ $obsStudioInstaller  = "$env:TEMP\obsStudio.exe"
 
 Stop-AppProcesses -NamePatterns @('obsStudio*')
 
-$slimeVROk = Install-App `
+$obsStudioOk = Install-App `
     -Name "obsStudio" `
     -Url $obsStudioURL `
     -InstallerPath $obsStudioInstaller `
@@ -260,7 +260,7 @@ $droidCamInstaller  = "$env:TEMP\droidCam.exe"
 
 Stop-AppProcesses -NamePatterns @('droidCam*')
 
-$slimeVROk = Install-App `
+$droidCamOk = Install-App `
     -Name "droidCam" `
     -Url $droidCamURL `
     -InstallerPath $droidCamInstaller `
