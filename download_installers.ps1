@@ -95,6 +95,16 @@ function Test-droidCamInstalled {
     return (Test-Path $exe)
 }
 
+#=== Generic installer helper ===
+function Install-App {
+    param(
+        [string]$Name,
+        [string]$Url,
+        [string]$InstallerPath,
+        [string]$SilentArgs,
+        [ScriptBlock]$IsInstalledCheck
+    )
+
     #Installer Checker
     Write-Log "---------- $Name install started ----------"
     if (& $IsInstalledCheck) {
