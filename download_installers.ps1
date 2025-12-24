@@ -91,8 +91,7 @@ function Test-obsStudioInstalled {
 }
 
 function Test-droidCamInstalled {
-    $pf86 = ${env:ProgramFiles(x86)}
-    $exe = "$pf86\droidCam\droidCam.exe"
+    $exe = "$env:ProgramFiles\DroidCam\Client\bin\64bit\droidcam.exe"
     return (Test-Path $exe)
 }
 
