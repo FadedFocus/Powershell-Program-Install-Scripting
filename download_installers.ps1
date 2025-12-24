@@ -86,8 +86,13 @@ function Test-slimeVRInstalled {
 }
 
 function Test-obsStudioInstalled {
+    $exe = "$env:ProgramFiles\obs-studio\bin\64bit\obs64.exe"
+    return (Test-Path $exe)
+}
+
+function Test-droidCamInstalled {
     $pf86 = ${env:ProgramFiles(x86)}
-    $exe = "$pf86\obsStudio\obsStudio.exe"
+    $exe = "$pf86\droidCam\droidCam.exe"
     return (Test-Path $exe)
 }
 
@@ -250,6 +255,19 @@ $slimeVROk = Install-App `
     -SilentArgs "/S" `
     -IsInstalledCheck { Test-obsStudioInstalled }
 
+# === Droid Cam ===
+$droidCamUrl        = "https://droidcam.app/go/droidCam.client.setup.exe"
+$droidCamInstaller  = "$env:TEMP\droidCam.exe"
+
+Stop-AppProcesses -NamePatterns @('droidCam*')
+
+$slimeVROk = Install-App `
+    -Name "droidCam" `
+    -Url $droidCamURL `
+    -InstallerPath $droidCamInstaller `
+    -SilentArgs "/S" `
+    -IsInstalledCheck { Test-droidCamInstalled }
+
 # === Additional applications (add more here later) ===
 # TEMPLATE for future apps in the === Script start === section:
 #
@@ -298,6 +316,12 @@ if (-not $slimeVROk) {
 if (-not $obsStudioOk) {
     $allOk = $false
     $failedAps += "OBS Studio"
+}
+
+# Record Droid Cam result
+if (-not $droidCamOk) {
+    $allOk = $false
+    $failedAps += "Droid Cam"
 }
 
 # IMPORTANT:
